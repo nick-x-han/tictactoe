@@ -5,7 +5,6 @@ const board = (function () {
     }
 
     const checkAllEqual = function(indicesList, playerValue) {
-        // const boardList = board.filter(index => indicesList.includes(index)).map(index => board[index]);
         return indicesList.every(index => index == playerValue);
     }
 
@@ -38,8 +37,21 @@ const board = (function () {
     return {updateCell, checkVictory, printBoard};
 })();
 
-function GameController() {
-
+function Player(name, value) {
+    let score = 0;
+    const updateScore = function () {
+        score++;
+    }
+    const getName = function() {
+        return name;
+    }
+    const getValue = function() {
+        return value;
+    }
+    return {updateScore, getName, getValue};
 }
 
-const game = GameController();
+//use displaycontroller to set names through dom later
+function GameController(name1, name2) {
+    
+}
