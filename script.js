@@ -45,6 +45,8 @@ const board = (function () {
 
     const resetBoard = function () {
         board.forEach((i, index) => board[index] = 0);
+        console.log("Board has been reset");
+        printBoard();
     }
 
     return { updateCell, checkVictory, checkTie, printBoard, resetBoard };
@@ -62,20 +64,23 @@ function Player(name, value) {
     const getName = function () {
         return name;
     }
+    const setName = function (newName) {
+        name = newName;
+    }
     const getValue = function () {
         return value;
     }
     const setValue = function (v) {
         value = v;
     }
-    return { getScore, updateScore, getName, setValue, getValue };
+    return { getScore, updateScore, getName, setValue, getValue, setName };
 }
 
 //use displaycontroller to set names through dom later
 function GameController(name1 = "Player 1", name2 = "Player 2", swapEachRound = true) {
     const players = [Player(name1, 1), Player(name2, 2)];
     let activePlayer = players[0];
-    let newGame = true;
+    let newGame = false;
 
     const isNewGame = function () {
         return newGame;
@@ -102,6 +107,11 @@ function GameController(name1 = "Player 1", name2 = "Player 2", swapEachRound = 
 
     const setSwapEachRound = function () {
         swapEachRound = !swapEachRound;
+    }
+
+    const restartGame = function () {
+        board.resetBoard();
+        newGame = true;
     }
 
     //this now basically returns if it's ok to change a cell's content. return is the player who just made a move, if they were able to make one
@@ -142,7 +152,7 @@ function GameController(name1 = "Player 1", name2 = "Player 2", swapEachRound = 
 
     printBeforeRound();
 
-    return { players, playRound, getActivePlayer, setSwapEachRound, isNewGame, switchPlayerValues };
+    return { players, playRound, getActivePlayer, setSwapEachRound, isNewGame, switchPlayerValues, restartGame };
 }
 
 const getMarker = function (value) {
@@ -150,6 +160,8 @@ const getMarker = function (value) {
 }
 
 const displayController = (function () {
+    const game = GameController();
+
     const container = document.querySelector(".container");
     const cells = document.querySelectorAll(".cell");
     const root = document.documentElement; //for colors
@@ -177,7 +189,7 @@ const displayController = (function () {
             cell.textContent = ""
             cell.className = "cell";
         });
-        gameResult.textContent = "";
+        updateGameStateDisplay(game.getActivePlayer());
     }
 
     const writeToBoard = function (e) {
@@ -196,23 +208,53 @@ const displayController = (function () {
             else if (currentPlayer === game.players[1])
                 e.target.classList.add("player-two");
             //updating score
-            scoreOne = game.players[0].getScore();
-            scoreTwo = game.players[1].getScore();
+            scoreTwo.textContent = game.players[1].getScore();
+            scoreOne.textContent = game.players[0].getScore();
+            //if current player just won
+            if (game.isNewGame()) {
+                if (!board.checkTie())
+                    updateGameStateDisplay(currentPlayer, "win");
+                else
+                    updateGameStateDisplay(currentPlayer, "tie");
+            }
+            else {
+                updateGameStateDisplay(game.getActivePlayer());
+            }
         }
     }
 
-    const updateDisplay = function(e) {
+    const updateGameStateDisplay = function (player, state="update") {
+        if (state === "tie") 
+            gameResult.textContent = "Game over. It was a tie!"
+        else if (state === "win") {
+            gameResult.textContent = "Game over. " + player.getName() + " won!"
+        }
+        //when modal is used to change the names
+        else if (state === "update") {
+            gameResult.textContent = player.getName() + "'s turn";
+        }
+    }
+
+    const updateNameDisplay = function(e) {
         e.preventDefault();
+        game.players[0].setName(nameOneInput.value);
+        game.players[1].setName(nameTwoInput.value);
         nameOne.textContent = nameOneInput.value;
         nameTwo.textContent = nameTwoInput.value;
+        updateGameStateDisplay(game.getActivePlayer());
         dialog.close();
     }
 
     container.addEventListener("click", writeToBoard);
-    confirmDialogButton.addEventListener("click", updateDisplay);
+    confirmDialogButton.addEventListener("click", updateNameDisplay);
     settingsButton.addEventListener("click", () => {
+        nameOneInput.value = game.players[0].getName();
+        nameTwoInput.value = game.players[1].getName();
         dialog.showModal();
     })
-})();
+    restartButton.addEventListener("click", clearCells);
 
-const game = GameController();
+    clearCells();
+
+    return {game};
+})();
