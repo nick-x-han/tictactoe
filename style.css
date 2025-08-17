@@ -11,6 +11,10 @@
 
 :root {
     --light-blue: #00bbcc;
+    --player-one-color: #8f99f7;
+    --player-two-color: #ff9999;
+    --x-color: #77ff77;
+    --o-color: #ff33ff;
 }
 
 body {
@@ -25,4 +29,24 @@ body {
     height: 300px;
     grid-template-columns: repeat(3, minmax(100px, 1fr));
     grid-template-rows: repeat(3, minmax(100px, 1fr));
+}
+
+.O, .X {
+    font-size: 48px;
+}
+
+.X {
+    color: var(--x-color);
+}
+
+.O {
+    color: var(--o-color);
+}
+
+.player-one {
+    background-color: var(--player-one-color);
+}
+
+.player-two {
+    background-color: var(--player-two-color);
 }

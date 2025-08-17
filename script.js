@@ -79,9 +79,7 @@ function GameController(name1 = "Player 1", name2 = "Player 2", swapEachRound = 
     }
 
     const switchPlayerTurn = function () {
-        let old = activePlayer;
         activePlayer = activePlayer === players[0] ? players[1] : players[0];
-        return old;
     }
 
     const getActivePlayer = function () {
@@ -103,10 +101,13 @@ function GameController(name1 = "Player 1", name2 = "Player 2", swapEachRound = 
         swapEachRound = !swapEachRound;
     }
 
-    //this now basically returns if it's ok to change a cell's content
+    //this now basically returns if it's ok to change a cell's content. return is the player who just made a move, if they were able to make one
     const playRound = function (index) {
         //whoever is X/goes first is determined by whoever has a value of 1
         if (newGame) {
+            if (swapEachRound) {
+                switchPlayerValues();
+            }
             activePlayer = players[0].getValue() == 1 ? players[0] : players[1];
             board.resetBoard(); //moved here so that the player can see the board after the game ends
             newGame = false;
@@ -115,54 +116,70 @@ function GameController(name1 = "Player 1", name2 = "Player 2", swapEachRound = 
         let value = activePlayer.getValue();
         let currentPlayer = activePlayer;
 
-        let properMove = board.updateCell(index, value)
-        //even if the index provided is not valid, proceed
+        let properMove = board.updateCell(index, value);
+        switchPlayerTurn();
+        printBeforeRound();
+        //don't proceed with an invalid move
         if (!properMove) {
-            currentPlayer = switchPlayerTurn();
+            printBeforeRound()
+            //have to switch the player back to the current one since they didn't actually make a move. 
+            switchPlayerTurn();
+            return;
         } //if the active player wins, or a tie
         else if (board.checkVictory(index, value) || board.checkTie()) {
             console.log("Match over!");
             if (board.checkVictory(index, value)) {
-                activePlayer.updateScore();
-            }
-            
-            if (swapEachRound) {
-                switchPlayerValues();
+                currentPlayer.updateScore();
             }
             newGame = true; //for swapping freely with GUI
-            return switchPlayerTurn(); //point is to avoid printing here
         }
 
-        printBeforeRound();
         return currentPlayer;
     }
 
     printBeforeRound();
 
-    return { playRound, getActivePlayer, setSwapEachRound, isNewGame, switchPlayerValues };
+    return { players, playRound, getActivePlayer, setSwapEachRound, isNewGame, switchPlayerValues };
+}
+
+const getMarker = function (value) {
+    return value == 1 ? 'X' : 'O';
 }
 
 const displayController = (function () {
     const container = document.querySelector(".container");
     const cells = document.querySelectorAll(".cell");
-    cells.forEach((cell, index) => cell.dataset.id = index);
-    container.addEventListener("click", e => {
+    const root = document.documentElement; //for colors
+    cells.forEach((cell, index) => {
+        cell.dataset.id = index
+    });
+
+    const clearCells = function () {
+        cells.forEach(cell => {
+            cell.textContent = ""
+            cell.className = "cell";
+        });
+    }
+
+    const writeToBoard = function (e) {
         if (game.isNewGame()) {
             clearCells();
         }
-        //if true, it returned the previous player
-        const currentPlayer = game.playRound(e.target.dataset.id);
+        //if true, the current player was able to make a move, so now it's moved on to the other player's turn.
+        const currentPlayer = game.playRound(+e.target.dataset.id);
         if (currentPlayer) {
-
-            e.target.textContent = currentPlayer.getValue();
-            //can add a class to the button that allows it to receive
-            //ceratin styling. e.g. class="o" -> blue and other stuff
+            let marker = getMarker(currentPlayer.getValue());
+            e.target.textContent = marker;
+            e.target.classList.add(marker);
+            //this is to style the background. the players can choose their own color
+            if (currentPlayer === game.players[0])
+                e.target.classList.add("player-one");
+            else if (currentPlayer === game.players[1])
+                e.target.classList.add("player-two");
         }
-    })
-
-    const clearCells = function() {
-        cells.forEach(cell => cell.textContent = "");
     }
+
+    container.addEventListener("click", writeToBoard);
 })();
 
 const game = GameController();
