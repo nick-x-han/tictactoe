@@ -22,13 +22,31 @@ body {
     padding: 0;
 }
 
+.main {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    min-height: 100vh;
+}
+
 .container {
     display: grid;
-    margin: 300px auto 0;
+    margin: 0 auto 0;
     width: 300px;
     height: 300px;
     grid-template-columns: repeat(3, minmax(100px, 1fr));
     grid-template-rows: repeat(3, minmax(100px, 1fr));
+}
+
+.display {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+}
+
+.game-result {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-size: 2rem;
 }
 
 .O, .X {
@@ -49,4 +67,49 @@ body {
 
 .player-two {
     background-color: var(--player-two-color);
+}
+
+.player-one, .player-two {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 1em;
+    font-size: 2rem;
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1em;
+}
+
+#restart, #settings {
+    padding: 0.5em 1em;
+    font-size: 1rem;
+    background-color: antiquewhite;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#dialog-close {
+    align-self: flex-end;
+    background-color: red;
+    color: white;
+    margin-bottom: 5px;
+
+}
+
+#dialog-confirm {
+    align-self: center;
+    margin-top: 1em;
+    font-size: 1.2rem;
+    background-color: #ffbb00;
+    border-radius: 8px;
+    padding: 0.5em 0.75em;
 }

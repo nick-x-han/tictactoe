@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,13 +9,52 @@
     <script defer src="script.js"></script>
 
 </head>
+
 <body>
     <div class="main">
         <div class="display">
-            <div class="score-one"></div>
-            <div class="score-two"></div>
-            <div class="name-one"></div>
-            <div class="name-two"></div>
+            <div class="player-one">
+                <div class="name-one">Player 1</div>
+                <div>Score: <span class="score-one">0</span></div>
+            </div>
+            <div class="options">
+                <div class="buttons">
+                    <button id="restart">Restart</button>
+                    <button id="settings">Settings</button>
+                </div>
+                <dialog>
+                    <form action="">
+                        <button id="dialog-close" formmethod="dialog">X</button>
+                        <div class="name-input">
+                            <div>
+                                <label for="name-one-input">Player 1's Name</label>
+                                <input type="text" id="name-one-input" name="name-one-input" value="Player 1">
+                            </div>
+                            <div>
+                                <label for="name-two-input">Player 2's Name</label>
+                                <input type="text" id="name-two-input" name="name-two-input" value="Player 2">
+                            </div>
+                        </div>
+                        <!-- <div class="color-input">
+                            <div>
+                                <label for="color-one-input">Player 1's Color</label>
+                                <input type="color" name="color-one-input" id="color-one-input">
+                            </div>
+                            <div>
+                                <label for="color-two-input">Player 2's Color</label>
+                                <input type="color" name="color-two-input" id="color-two-input">
+                            </div>
+                        </div> -->
+                        <button id="dialog-confirm">Confirm</button>
+                    </form>
+                </dialog>
+
+            </div>
+            <div class="player-two">
+                <div class="name-two">Player 2</div>
+                <div>Score: <span class="score-two">0</span></div>
+            </div>
+            <div class="game-result"></div>
         </div>
         <div class="container">
             <button class="cell"></button>
@@ -29,4 +69,5 @@
         </div>
     </div>
 </body>
+
 </html>

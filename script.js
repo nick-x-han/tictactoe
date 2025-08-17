@@ -56,6 +56,9 @@ function Player(name, value) {
         score++;
         console.log(`${name} just won and now has ${score} points!`);
     }
+    const getScore = function() {
+        return score;
+    }
     const getName = function () {
         return name;
     }
@@ -65,7 +68,7 @@ function Player(name, value) {
     const setValue = function (v) {
         value = v;
     }
-    return { updateScore, getName, setValue, getValue };
+    return { getScore, updateScore, getName, setValue, getValue };
 }
 
 //use displaycontroller to set names through dom later
@@ -150,6 +153,21 @@ const displayController = (function () {
     const container = document.querySelector(".container");
     const cells = document.querySelectorAll(".cell");
     const root = document.documentElement; //for colors
+    const gameResult = document.querySelector(".game-result");
+    const scoreOne = document.querySelector(".score-one");
+    const scoreTwo = document.querySelector(".score-two");
+    const nameOne = document.querySelector(".name-one");
+    const nameTwo = document.querySelector(".name-two");
+
+    const nameOneInput = document.querySelector("#name-one-input");
+    const nameTwoInput = document.querySelector("#name-two-input");
+    const closeDialogButton = document.querySelector("#dialog-close");
+    const confirmDialogButton = document.querySelector("#dialog-confirm");
+    const settingsButton = document.querySelector("#settings");
+    const restartButton = document.querySelector("#restart");
+    const dialog = document.querySelector("dialog");
+
+
     cells.forEach((cell, index) => {
         cell.dataset.id = index
     });
@@ -159,6 +177,7 @@ const displayController = (function () {
             cell.textContent = ""
             cell.className = "cell";
         });
+        gameResult.textContent = "";
     }
 
     const writeToBoard = function (e) {
@@ -176,10 +195,24 @@ const displayController = (function () {
                 e.target.classList.add("player-one");
             else if (currentPlayer === game.players[1])
                 e.target.classList.add("player-two");
+            //updating score
+            scoreOne = game.players[0].getScore();
+            scoreTwo = game.players[1].getScore();
         }
     }
 
+    const updateDisplay = function(e) {
+        e.preventDefault();
+        nameOne.textContent = nameOneInput.value;
+        nameTwo.textContent = nameTwoInput.value;
+        dialog.close();
+    }
+
     container.addEventListener("click", writeToBoard);
+    confirmDialogButton.addEventListener("click", updateDisplay);
+    settingsButton.addEventListener("click", () => {
+        dialog.showModal();
+    })
 })();
 
 const game = GameController();
