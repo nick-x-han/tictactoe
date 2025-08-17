@@ -116,19 +116,19 @@ function GameController(name1 = "Player 1", name2 = "Player 2", swapEachRound = 
     const restartGame = function () {
         //not setting newGame = true here to avoid switching turns
         board.resetBoard();
+        //if pressing restart right after finishing a round
+        if (newGame) {
+            if (swapEachRound)
+                switchPlayerValues();
+            newGame = false;
+        }
         setActivePlayer();
     }
 
     //this now basically returns if it's ok to change a cell's content. return is the player who just made a move, if they were able to make one
     const playRound = function (index) {
-        //whoever is X/goes first is determined by whoever has a value of 1
         if (newGame) {
-            if (swapEachRound) {
-                switchPlayerValues();
-            }
-            setActivePlayer();
-            board.resetBoard(); //moved here so that the player can see the board after the game ends
-            newGame = false;
+            restartGame();
         }
 
         let value = activePlayer.getValue();
