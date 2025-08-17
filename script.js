@@ -111,19 +111,16 @@ function GameController(name1 = "Player 1", name2 = "Player 2", swapEachRound = 
             board.resetBoard(); //moved here so that the player can see the board after the game ends
             newGame = false;
         }
-        else {
-            
-        }
+
         let value = activePlayer.getValue();
+        let currentPlayer = activePlayer;
 
-        //if the index provided is invalid, have to recall playRound
-        if (!board.updateCell(index, value)) {
-            printBeforeRound();
-            return;
-        }
-
-        //if the active player wins, or a tie
-        if (board.checkVictory(index, value) || board.checkTie()) {
+        let properMove = board.updateCell(index, value)
+        //even if the index provided is not valid, proceed
+        if (!properMove) {
+            currentPlayer = switchPlayerTurn();
+        } //if the active player wins, or a tie
+        else if (board.checkVictory(index, value) || board.checkTie()) {
             console.log("Match over!");
             if (board.checkVictory(index, value)) {
                 activePlayer.updateScore();
@@ -135,9 +132,9 @@ function GameController(name1 = "Player 1", name2 = "Player 2", swapEachRound = 
             newGame = true; //for swapping freely with GUI
             return switchPlayerTurn(); //point is to avoid printing here
         }
-        let previousPlayer = switchPlayerTurn();
+
         printBeforeRound();
-        return previousPlayer;
+        return currentPlayer;
     }
 
     printBeforeRound();
@@ -150,13 +147,22 @@ const displayController = (function () {
     const cells = document.querySelectorAll(".cell");
     cells.forEach((cell, index) => cell.dataset.id = index);
     container.addEventListener("click", e => {
+        if (game.isNewGame()) {
+            clearCells();
+        }
         //if true, it returned the previous player
         const currentPlayer = game.playRound(e.target.dataset.id);
         if (currentPlayer) {
 
             e.target.textContent = currentPlayer.getValue();
+            //can add a class to the button that allows it to receive
+            //ceratin styling. e.g. class="o" -> blue and other stuff
         }
     })
+
+    const clearCells = function() {
+        cells.forEach(cell => cell.textContent = "");
+    }
 })();
 
 const game = GameController();
