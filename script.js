@@ -1,46 +1,41 @@
 const board = (function () {
     const board = [];
-    for (let i = 0; i < 3; i++) {
-        board[i] = []
-        for (let j = 0; j < 3; j++) {
-            board[i].push(0);
-        }
+    for (let i = 0; i < 9; i++) {
+        board.push(i);
     }
 
-    //1D is easier to check conditions for
-    const convertTo1D = function(row, column) {
-        return row * 3 + column;
+    const checkAllEqual = function(indicesList, playerValue) {
+        // const boardList = board.filter(index => indicesList.includes(index)).map(index => board[index]);
+        return indicesList.every(index => index == playerValue);
     }
 
-    const check2DWith1D = function(index) {
-        const row = 
-        return board
-    }
     //this just checks for a victory; the game controller will handle the actual victory logic
-    const checkVictory = function(row, column, playerValue) {
-        //only need to check for the just-changed part
-        const index = convertTo1D(row, column);
-        //if on one of the four corners and the center matches
-        if (index != 4 && index % 2 == 0 && board[1][1] === playerValue) {
-            if (Math.abs(index - 8))
-        }
+    const checkVictory = function(index, playerValue) {
+        const permutations = [[0, 4, 8], [2, 4, 6], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 1, 2], [3, 4, 5], [6, 7, 8]];
+        //only need to check for the player who just moved and the cell they chose
+        const possiblePermutations = permutations.filter(p => p.includes(index));
+        //check if at least one of the permutations has been solved
+        return possiblePermutations.some(p => checkAllEqual(p, playerValue))
     }
 
-    const updateCell = function(row, column, playerValue) {
+    //returns whether an update was successful
+    const updateCell = function(index, playerValue) {
         //mainly for console
         if (playerValue != 1 || playerValue != 2) {
-            return;
+            return false;
         }
         //this validates that the player changes an unchanged cell
-        if (board[row][column] == 0)
-            board[row][column] = playerValue;
+        if (board[index] != 0) return false;
+        
+        board[index] = playerValue;
+        return true;
     }
     
     const printBoard = function() {
         console.log(board);
     }
 
-    return {updateCell, printBoard};
+    return {updateCell, checkVictory, printBoard};
 })();
 
 function GameController() {
