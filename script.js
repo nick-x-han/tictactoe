@@ -94,6 +94,10 @@ function GameController(name1 = "Player 1", name2 = "Player 2", swapEachRound = 
         return activePlayer;
     }
 
+    const setActivePlayer = function() {
+        activePlayer = players[0].getValue() == 1 ? players[0] : players[1];
+    }
+
     const switchPlayerValues = function () {
         let temp = players[1].getValue();
         players[1].setValue(players[0].getValue());
@@ -110,8 +114,9 @@ function GameController(name1 = "Player 1", name2 = "Player 2", swapEachRound = 
     }
 
     const restartGame = function () {
+        //not setting newGame = true here to avoid switching turns
         board.resetBoard();
-        newGame = true;
+        setActivePlayer();
     }
 
     //this now basically returns if it's ok to change a cell's content. return is the player who just made a move, if they were able to make one
@@ -121,7 +126,7 @@ function GameController(name1 = "Player 1", name2 = "Player 2", swapEachRound = 
             if (swapEachRound) {
                 switchPlayerValues();
             }
-            activePlayer = players[0].getValue() == 1 ? players[0] : players[1];
+            setActivePlayer();
             board.resetBoard(); //moved here so that the player can see the board after the game ends
             newGame = false;
         }
@@ -252,7 +257,10 @@ const displayController = (function () {
         nameTwoInput.value = game.players[1].getName();
         dialog.showModal();
     })
-    restartButton.addEventListener("click", clearCells);
+    restartButton.addEventListener("click", e => {
+        game.restartGame();
+        clearCells();
+    });
 
     clearCells();
 
