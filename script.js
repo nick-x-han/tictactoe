@@ -5,7 +5,7 @@ const board = (function () {
     }
 
     const checkAllEqual = function (indicesList, playerValue) {
-        return indicesList.every(index => index == playerValue);
+        return indicesList.every(index => board[index] == playerValue);
     }
 
     //this just checks for a victory; the game controller will handle the actual victory logic
@@ -20,11 +20,14 @@ const board = (function () {
     //returns whether an update was successful
     const updateCell = function (index, playerValue) {
         //mainly for console
-        if (playerValue != 1 || playerValue != 2) {
+        if (playerValue != 1 && playerValue != 2) {
             return false;
         }
-        //this validates that the player changes an unchanged cell
-        if (board[index] != 0) return false;
+        //this validates that the player changes an unchanged cell and also that the index is between 0 and 9
+        if (board[index] != 0) {
+            console.log("Not a valid cell index, try again");
+            return false;
+        }
 
         board[index] = playerValue;
         return true;
@@ -35,7 +38,9 @@ const board = (function () {
     }
 
     const printBoard = function () {
-        console.log(board);
+        console.log(`${board[0]} ${board[1]} ${board[2]}`);
+        console.log(`${board[3]} ${board[4]} ${board[5]}`);
+        console.log(`${board[6]} ${board[7]} ${board[8]}`);
     }
 
     const resetBoard = function () {
@@ -64,7 +69,7 @@ function Player(name, value) {
 }
 
 //use displaycontroller to set names through dom later
-function GameController(name1, name2, swapEachRound) {
+function GameController(name1 = "Player 1", name2 = "Player 2", swapEachRound = true) {
     const players = [Player(name1, 1), Player(name2, 2)];
     let activePlayer = players[0];
     let newGame = true;
@@ -88,7 +93,7 @@ function GameController(name1, name2, swapEachRound) {
     }
 
     const printBeforeRound = function () {
-        console.log(`It's ${activePlayer}'s turn.`);
+        console.log(`It's ${activePlayer.getName()}'s turn.`);
         board.printBoard();
     }
 
@@ -103,8 +108,12 @@ function GameController(name1, name2, swapEachRound) {
             newGame = false;
         }
         let value = activePlayer.getValue();
+        
         //if the index provided is invalid, have to recall playRound
-        if (!board.updateCell(index, value)) return;
+        if (!board.updateCell(index, value)) {
+            printBeforeRound();
+            return;
+        }
 
         //if the active player wins, or a tie
         if (board.checkVictory(index, value) || board.checkTie()) {
@@ -117,8 +126,8 @@ function GameController(name1, name2, swapEachRound) {
                 switchPlayerValues();
             }
             newGame = true; //for swapping freely with GUI
-            printBeforeRound();
-            return; 
+            // printBeforeRound();
+            // return; 
         }
         switchPlayerTurn();
         printBeforeRound();
