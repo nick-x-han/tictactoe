@@ -1,0 +1,28 @@
+.cell {
+    width: 100px;
+    height: 100px;
+    box-sizing: border-box;
+    border: 1px var(--light-blue) solid;
+}
+
+.cell:hover {
+    background-color: #00bbcc;
+}
+
+:root {
+    --light-blue: #00bbcc;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    display: grid;
+    margin: 300px auto 0;
+    width: 300px;
+    height: 300px;
+    grid-template-columns: repeat(3, minmax(100px, 1fr));
+    grid-template-rows: repeat(3, minmax(100px, 1fr));
+}

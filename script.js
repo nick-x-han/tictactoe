@@ -79,7 +79,9 @@ function GameController(name1 = "Player 1", name2 = "Player 2", swapEachRound = 
     }
 
     const switchPlayerTurn = function () {
+        let old = activePlayer;
         activePlayer = activePlayer === players[0] ? players[1] : players[0];
+        return old;
     }
 
     const getActivePlayer = function () {
@@ -101,14 +103,19 @@ function GameController(name1 = "Player 1", name2 = "Player 2", swapEachRound = 
         swapEachRound = !swapEachRound;
     }
 
+    //this now basically returns if it's ok to change a cell's content
     const playRound = function (index) {
         //whoever is X/goes first is determined by whoever has a value of 1
         if (newGame) {
             activePlayer = players[0].getValue() == 1 ? players[0] : players[1];
+            board.resetBoard(); //moved here so that the player can see the board after the game ends
             newGame = false;
         }
+        else {
+            
+        }
         let value = activePlayer.getValue();
-        
+
         //if the index provided is invalid, have to recall playRound
         if (!board.updateCell(index, value)) {
             printBeforeRound();
@@ -121,21 +128,35 @@ function GameController(name1 = "Player 1", name2 = "Player 2", swapEachRound = 
             if (board.checkVictory(index, value)) {
                 activePlayer.updateScore();
             }
-            board.resetBoard();
+            
             if (swapEachRound) {
                 switchPlayerValues();
             }
             newGame = true; //for swapping freely with GUI
-            // printBeforeRound();
-            // return; 
+            return switchPlayerTurn(); //point is to avoid printing here
         }
-        switchPlayerTurn();
+        let previousPlayer = switchPlayerTurn();
         printBeforeRound();
+        return previousPlayer;
     }
 
     printBeforeRound();
 
     return { playRound, getActivePlayer, setSwapEachRound, isNewGame, switchPlayerValues };
 }
+
+const displayController = (function () {
+    const container = document.querySelector(".container");
+    const cells = document.querySelectorAll(".cell");
+    cells.forEach((cell, index) => cell.dataset.id = index);
+    container.addEventListener("click", e => {
+        //if true, it returned the previous player
+        const currentPlayer = game.playRound(e.target.dataset.id);
+        if (currentPlayer) {
+
+            e.target.textContent = currentPlayer.getValue();
+        }
+    })
+})();
 
 const game = GameController();
